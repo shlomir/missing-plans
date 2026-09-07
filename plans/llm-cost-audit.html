@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM &amp; Cost Surface Audit — missing.org.il</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#0c0d10; --surface:#15171c; --surface-2:#1b1e24; --line:#262a32; --line-soft:#1f2229;
+    --ink:#f4f5f7; --ink-2:#b7bcc7; --muted:#7d8390;
+    --blue:#3987e5; --orange:#d95926; --aqua:#199e70; --gold:#c98500; --gold-bright:#eda100;
+    --red:#e66767; --violet:#9085e9; --green:#25b025;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --disp:"Space Grotesk","Inter",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--page);color:var(--ink);font:15px/1.65 var(--sans)}
+  a{color:var(--blue);text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px 90px}
+
+  /* hero */
+  header{border-bottom:1px solid var(--line);background:
+    radial-gradient(1100px 420px at 85% -60%, rgba(201,133,0,.16), transparent 60%),
+    radial-gradient(900px 400px at 10% -40%, rgba(57,135,229,.14), transparent 60%)}
+  .hero{max-width:1120px;margin:0 auto;padding:64px 32px 44px}
+  .kicker{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:16px}
+  h1{font:700 clamp(30px,4.5vw,44px)/1.12 var(--disp);margin:0 0 12px;letter-spacing:-.015em}
+  .hero p{max-width:760px;color:var(--ink-2);font-size:16px;margin:0}
+  .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+  @media(max-width:840px){.hero-stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:rgba(21,23,28,.72);border:1px solid var(--line);border-radius:14px;padding:16px 18px;backdrop-filter:blur(4px)}
+  .stat .n{font:600 30px/1.1 var(--disp);letter-spacing:-.01em}
+  .stat .l{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .stat.alert .n{color:var(--gold-bright)}
+  .stat.bad .n{color:var(--red)}
+
+  /* section chrome */
+  section{margin-top:64px}
+  .sec-k{font:600 11.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h2{font:600 25px/1.2 var(--disp);margin:8px 0 8px;letter-spacing:-.01em}
+  .sec-lede{color:var(--ink-2);max-width:800px;margin:0 0 24px}
+  h3{font:600 17px/1.3 var(--disp);margin:30px 0 10px}
+  p{color:var(--ink-2)}
+  code{font:500 12.5px var(--mono);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1.5px 6px;color:#dfe3ea;white-space:nowrap}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;overflow-x:auto;font:13px/1.6 var(--mono);color:#d5dae2;margin:14px 0}
+  pre code{background:none;border:none;padding:0;white-space:pre}
+  .scroll{overflow-x:auto}
+
+  /* badges */
+  .b{display:inline-flex;align-items:center;gap:5px;font:600 11px/1 var(--mono);letter-spacing:.04em;border-radius:99px;padding:4px 10px;white-space:nowrap}
+  .b::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .b-usage{color:#f0b32e;background:rgba(201,133,0,.13)}
+  .b-credits{color:#69a9f2;background:rgba(57,135,229,.13)}
+  .b-sub{color:#b3a7ff;background:rgba(144,133,233,.14)}
+  .b-free{color:#4cc38a;background:rgba(25,158,112,.13)}
+  .b-auto{color:#ef8c68;background:rgba(217,89,38,.14)}
+  .b-user{color:#9aa1ad;background:rgba(125,131,144,.14)}
+  .b-pii{color:#f08c8c;background:rgba(230,103,103,.13)}
+
+  /* surface table */
+  table.t{border-collapse:collapse;width:100%;font-size:13.5px}
+  table.t th{font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+  table.t td{padding:11px 14px;border-bottom:1px solid var(--line-soft);color:var(--ink-2);vertical-align:top}
+  table.t td:first-child{color:var(--ink);font-weight:500}
+  table.t tr:hover td{background:rgba(255,255,255,.018)}
+
+  /* call-family cards */
+  .fam{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin:18px 0;overflow:hidden}
+  .fam-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 22px;border-bottom:1px solid var(--line-soft)}
+  .fam-h .idx{font:600 13px var(--mono);color:var(--page);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+  .fam-h b{font:600 16.5px var(--disp);color:var(--ink)}
+  .fam-h .he{color:var(--muted);font-size:13.5px}
+  .fam-h .spacer{flex:1}
+  .fam-grid{display:grid;grid-template-columns:170px 1fr;gap:0}
+  .fam-grid>div{padding:11px 22px;border-bottom:1px solid var(--line-soft);font-size:13.5px}
+  .fam-grid>div:nth-last-child(-n+2){border-bottom:none}
+  .fam-grid .k{font:600 11.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding-top:13px}
+  .fam-grid .v{color:var(--ink-2)}
+  .fam-grid .v b{color:var(--ink);font-weight:600}
+  @media(max-width:700px){.fam-grid{grid-template-columns:1fr}.fam-grid .k{padding-bottom:0;border-bottom:none}}
+
+  /* gaps */
+  .gaps{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.gaps{grid-template-columns:1fr}}
+  .gap{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:12px;padding:16px 18px}
+  .gap b{color:var(--ink);font-weight:600;display:block;margin-bottom:4px}
+  .gap p{font-size:13.5px;margin:0}
+
+  /* pipeline diagram */
+  .pipe{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap}
+  .pnode{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 18px;min-width:170px;flex:1}
+  .pnode b{display:block;font:600 13.5px var(--disp);color:var(--ink)}
+  .pnode span{font-size:12px;color:var(--muted)}
+  .parrow{display:flex;align-items:center;padding:0 12px;color:var(--muted);font-size:18px;flex:none}
+  @media(max-width:800px){.pipe{flex-direction:column}.parrow{transform:rotate(90deg);justify-content:center;padding:4px 0}}
+
+  /* checklist */
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
+  ol.steps li{counter-increment:s;position:relative;padding:14px 18px 14px 58px;background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:10px 0;color:var(--ink-2);font-size:14px}
+  ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:18px;top:14px;font:600 13px var(--mono);color:var(--gold-bright)}
+  ol.steps li b{color:var(--ink)}
+
+  /* mock frame */
+  .frame{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:20px 0;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  .frame-bar{display:flex;align-items:center;gap:6px;background:#22242b;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .frame-bar i{width:10px;height:10px;border-radius:50%;background:#3a3d46;display:inline-block}
+  .frame-bar span{font:12px var(--mono);color:var(--muted);margin-inline-start:10px}
+  .mock{background:#f9fafb;color:#111827;padding:20px;direction:rtl;text-align:right;font-family:var(--sans)}
+  .mock .mh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .mock h4{margin:0;font-size:18px}
+  .mock .msub{font-size:12.5px;color:#6b7280}
+  .mock .msp{flex:1}
+  .mbtn{border-radius:8px;font-size:12.5px;font-weight:600;padding:7px 12px;border:1px solid #e5e7eb;background:#fff;color:#374151;white-space:nowrap}
+  .mkpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  @media(max-width:760px){.mkpis{grid-template-columns:repeat(2,1fr)}}
+  .mkpi{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px}
+  .mkpi .l{font-size:11.5px;color:#6b7280}
+  .mkpi .v{font-size:20px;font-weight:650;margin-top:2px}
+  .mkpi .d{font-size:11px;color:#6b7280}
+  table.mt{border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+  table.mt th{text-align:right;font-weight:600;color:#6b7280;padding:8px 10px;background:#f9fafb;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+  table.mt td{padding:8px 10px;border-bottom:1px solid #f3f4f6;color:#374151;white-space:nowrap}
+  table.mt td.num{font-variant-numeric:tabular-nums}
+  .mpill{font-size:10.5px;border-radius:99px;padding:2px 8px;font-weight:600}
+  .ok{background:#dcfce7;color:#15803d}.err{background:#fee2e2;color:#b91c1c}
+  .src1{background:#e8f1fc;color:#1c5cab}.src2{background:#fdeee6;color:#b4451c}.src3{background:#e2f5ed;color:#0c6b4a}.src4{background:#fdf3da;color:#8a6100}.src5{background:#efeafd;color:#5b4bc4}
+
+  .note{background:rgba(57,135,229,.08);border:1px solid rgba(57,135,229,.28);border-radius:12px;padding:14px 18px;margin:16px 0;font-size:14px;color:var(--ink-2)}
+  .note b{color:var(--ink)}
+  .warn{background:rgba(201,133,0,.09);border:1px solid rgba(201,133,0,.3);border-radius:12px;padding:14px 18px;margin:16px 0;font-size:14px;color:var(--ink-2)}
+  footer{margin-top:70px;border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hero">
+    <div class="kicker">Cost Audit · missing.org.il · 07.09.2026</div>
+    <h1>LLM &amp; Cost Surface Audit<br>+ Full Call-Ledger Capability</h1>
+    <p>Every place the code and the Base44 platform can spend money — LLM calls in full depth — and the design for a per-call ledger capturing <b>what was sent, what came back, when, who called, which API, which model, and what it cost</b>.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="n">8</div><div class="l">LLM call families found</div></div>
+      <div class="stat"><div class="n">~15</div><div class="l">distinct LLM call sites in code</div></div>
+      <div class="stat alert"><div class="n">4</div><div class="l">fire automatically, with no human in the loop</div></div>
+      <div class="stat bad"><div class="n">$0.00</div><div class="l">cost tracked today — every estimate field is hard-coded 0</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ============ 1. COST SURFACE ============ -->
+<section id="surface">
+  <div class="sec-k">Part 1</div>
+  <h2>The full cost surface</h2>
+  <p class="sec-lede">Everything in the repo and platform that costs money, by billing type. Four billing channels exist: <span class="b b-usage">usage-based API</span> keys you pay directly, <span class="b b-credits">Base44 credits</span> consumed by platform integrations, <span class="b b-sub">subscriptions</span>, and <span class="b b-free">free</span> services worth confirming stay free.</p>
+
+  <div class="scroll"><table class="t">
+    <tr><th>Service</th><th>Billing</th><th>Where in code</th><th>What drives cost</th></tr>
+    <tr><td>OpenAI API <span style="color:var(--muted)">(OPENAI_API_KEY)</span></td><td><span class="b b-usage">usage</span></td><td>translations, simulator, transcription fallback, Soniox translation step</td><td>tokens in/out per call; audio minutes on <code>/v1/audio/transcriptions</code></td></tr>
+    <tr><td>Soniox STT <span style="color:var(--muted)">(SONIOX_API_KEY)</span></td><td><span class="b b-usage">usage</span></td><td><code>shared/sonioxTranscription.ts</code>, <code>transcriptionWorker</code>, <code>transcribeByProvider</code></td><td>audio hours transcribed — model <code>stt-async-preview</code>; default STT provider</td></tr>
+    <tr><td>Base44 <code>Core.InvokeLLM</code></td><td><span class="b b-credits">credits</span></td><td>case analysis workers, interview summaries</td><td>per-call credits, scaled by model choice (<code>ai_model_name</code>) and internet context</td></tr>
+    <tr><td>Base44 agent <code>backoffice_assistant</code></td><td><span class="b b-credits">credits</span></td><td><code>base44/agents/backoffice_assistant.jsonc</code> — model <code>gpt_5_5</code></td><td>per message; agent has entity-tool access, so each answer can chain tool calls</td></tr>
+    <tr><td>Base44 <code>ExtractDataFromUploadedFile</code></td><td><span class="b b-credits">credits</span></td><td><code>LogisticsInventoryCount.jsx</code> (frontend, inventory OCR)</td><td>per file processed — LLM-backed extraction</td></tr>
+    <tr><td>Base44 <code>SendEmail</code></td><td><span class="b b-credits">credits</span></td><td><code>createExternalEvent</code>, <code>MassEmailDialog</code> (mass send loop), <code>Users.jsx</code></td><td>per email; the mass dialog loops over the entire volunteer roster</td></tr>
+    <tr><td>Green API (WhatsApp)</td><td><span class="b b-sub">subscription</span></td><td><code>otp/request</code>, <code>sendOtpWhatsapp</code>, <code>sendWhatsAppToCommander</code>, broadcasts</td><td>instance subscription tier; message volume within plan limits</td></tr>
+    <tr><td>CalTopo</td><td><span class="b b-sub">subscription</span></td><td>~8 map functions (<code>createCaltopoMap</code>, <code>caltopoMapHandler</code>, …)</td><td>team plan tier; not per-call</td></tr>
+    <tr><td>Base44 platform &amp; storage</td><td><span class="b b-sub">subscription</span></td><td>entire app; <code>UploadFile</code>, secure documents, DB</td><td>plan tier + storage growth (audio files, attachments, backups)</td></tr>
+    <tr><td>Google Drive (connectors)</td><td><span class="b b-free">free*</span></td><td><code>backupEntitiesToGoogleDrive</code>, <code>syncGoogleDrive</code>, calendar</td><td>free within Workspace storage quota — watch backup growth</td></tr>
+    <tr><td>GovMap, Stride open-bus API</td><td><span class="b b-free">free</span></td><td><code>convertAddressToITM</code>, <code>transit</code> (open-bus-stride-api.hasadna.org.il)</td><td>public/government services</td></tr>
+    <tr><td>Base44 <code>SendSMS</code>, <code>GenerateImage</code></td><td><span class="b b-free">unused</span></td><td>exported in <code>src/api/integrations.js</code> only — no live call site found</td><td>zero today; would bill credits if adopted</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 2. LLM INVENTORY ============ -->
+<section id="llm">
+  <div class="sec-k">Part 2</div>
+  <h2>LLM call inventory — every call site, in depth</h2>
+  <p class="sec-lede">Eight families. For each: who triggers it, the exact API, the model, what is sent, what comes back, and what (if anything) is recorded today. <span class="b b-auto">automatic</span> means no human decides to spend; <span class="b b-pii">PII</span> means missing-person personal data leaves the platform in the prompt.</p>
+
+  <!-- 1 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--blue)">1</span><b>Case AI Analysis</b><span class="he">ניתוח אירוע</span><span class="spacer"></span><span class="b b-user">user-triggered</span><span class="b b-credits">credits</span><span class="b b-pii">PII</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v">User requests analysis on a case → <code>AIJob</code> record → <b>AI Job Worker</b> workflow → <code>runWorker</code>; a parallel path calls <code>queueAnalysis</code> directly. Three near-duplicate implementations exist: <code>queueAnalysis</code>, <code>runWorker</code>, <code>ai/runWorker</code>.</div>
+      <div class="k">API</div><div class="v"><code>base44.asServiceRole.integrations.Core.InvokeLLM</code></div>
+      <div class="k">Model</div><div class="v"><code>ai_model_name</code> SystemSetting (default <b>automatic</b>; admin can pick GPT / Claude / Gemini in AISettings). On failure retries with hard-coded <b>gpt-4o</b>.</div>
+      <div class="k">What is sent</div><div class="v">Per-chunk: prompt prefix + <b>full case records</b> for each of 7 entity types — MissingPerson card, all Interviews, TimelineEvents, Evidence, Tasks, MedicalCareEpisodes, SearchSectors. Final call: all chunk summaries + synthesis prompt. Optional <code>add_context_from_internet</code> (extra cost + sends case details to search).</div>
+      <div class="k">What is received</div><div class="v">Per-chunk JSON summary; final JSON — <code>summary_markdown</code>, <code>recommendations_markdown</code>, <code>risks_markdown</code>, <code>next_questions_markdown</code>, <code>sources</code>.</div>
+      <div class="k">Calls per run</div><div class="v"><b>Up to 8</b> (7 chunks + 1 final), plus fallback retries → up to ~10 billable calls per button press.</div>
+      <div class="k">Logged today</div><div class="v"><code>AIAnalysis</code> record stores <code>final_prompt</code> and outputs — but <code>input/output_token_estimate</code> and <code>cost_estimate_usd</code> are <b style="color:var(--red)">hard-coded 0</b>. No timing, no per-chunk record.</div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--orange)">2</span><b>Interview Summary</b><span class="he">סיכום תשאול</span><span class="spacer"></span><span class="b b-auto">automatic</span><span class="b b-credits">credits</span><span class="b b-pii">PII</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v"><b>Every interview save</b>: <i>Enqueue Interview Summary on Save</i> workflow creates an <code>InterviewSummary</code> → <i>Interview Summary Worker</i> workflow → <code>processInterviewSummary</code> → <code>shared/interviewAnalysis.ts</code>.</div>
+      <div class="k">API</div><div class="v"><code>Core.InvokeLLM</code> — <b>two calls per interview</b>: <code>runInterviewAnalysis</code> + <code>runCaseInsightsAnalysis</code>.</div>
+      <div class="k">Model</div><div class="v"><code>ai_model_name</code> setting; when "automatic", defaults to <b>gpt_5_mini</b>.</div>
+      <div class="k">What is sent</div><div class="v">Interview transcript + interviewee details + case-insight context prompt.</div>
+      <div class="k">What is received</div><div class="v">Structured summary + case-level insights written back to <code>InterviewSummary</code>.</div>
+      <div class="k">Logged today</div><div class="v">Outputs only. No tokens, no cost, no latency.</div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--aqua)">3</span><b>Interview Transcription</b><span class="he">תמלול</span><span class="spacer"></span><span class="b b-auto">automatic</span><span class="b b-usage">usage</span><span class="b b-pii">PII</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v">Interview saved with audio → <i>Interview Transcription Worker</i> workflow (on <code>transcription_status == "processing"</code>) → <code>transcriptionWorker</code> / <code>transcribeByProvider</code>; also <code>retryTranscription</code>, <code>transcribeInterviewAndCreateRecord</code>, <code>sttSelfTest</code>.</div>
+      <div class="k">API</div><div class="v">Provider from <code>ai_stt_provider</code> setting — default <b>Soniox</b> (<code>api.soniox.com/v1</code>, model <code>stt-async-preview</code>); alternative <b>OpenAI</b> <code>/v1/audio/transcriptions</code> (<code>whisper-1</code> → fallback <code>gpt-4o-mini-transcribe</code>).</div>
+      <div class="k">What is sent</div><div class="v">The <b>entire audio file</b> of the interview.</div>
+      <div class="k">What is received</div><div class="v">Transcript (<code>verbose_json</code>/<code>json</code>). Post-steps call OpenAI chat (<code>gpt-4o-mini</code>) for translation / cleanup — <code>translateWithOpenAI</code> in the shared module.</div>
+      <div class="k">Cost driver</div><div class="v">Audio <b>minutes</b>, not tokens — plus the token cost of the post-processing chat calls.</div>
+      <div class="k">Logged today</div><div class="v">Transcript only. Audio duration is not recorded as a cost dimension anywhere.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--gold)">4</span><b>WhatsApp Voice-Note Transcription</b><span class="he">הקלטות נכנסות</span><span class="spacer"></span><span class="b b-auto">automatic · unattended</span><span class="b b-usage">usage</span><span class="b b-pii">PII</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v"><b>Any inbound WhatsApp voice note</b>: <code>shared/whatsappProcessing.ts</code> auto-invokes <code>transcribeByProvider</code> (source <code>whatsapp_inbound_audio_transcription</code>). Nobody approves the spend — an outside sender causes it.</div>
+      <div class="k">API / model</div><div class="v">Same Soniox / OpenAI STT path as family 3.</div>
+      <div class="k">What is sent / received</div><div class="v">The voice recording → transcript attached to the case as evidence/discussion.</div>
+      <div class="k">Risk</div><div class="v">Cost is externally drivable: a long voice note (or many) from any known number spends money silently. A per-file duration cap and a daily budget alert belong here.</div>
+      <div class="k">Logged today</div><div class="v">Audit metadata of the finding — no cost, duration, or provider usage record.</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--violet)">5</span><b>Translation Jobs</b><span class="he">תרגומים</span><span class="spacer"></span><span class="b b-auto">scheduled</span><span class="b b-usage">usage</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v"><i>Process Translation Jobs</i> workflow runs <code>processTranslationJobs</code> on a <b>fixed interval</b> (polling); <code>processTranslationJob</code> handles single jobs. Two OpenAI call sites in each.</div>
+      <div class="k">API / model</div><div class="v">Direct <code>fetch</code> to <code>api.openai.com/v1/chat/completions</code>, hard-coded <b>gpt-4o-mini</b>, <code>OPENAI_API_KEY</code> env.</div>
+      <div class="k">What is sent / received</div><div class="v">Text to translate + instructions → translated text.</div>
+      <div class="k">Logged today</div><div class="v">Job status only. The OpenAI response includes an exact <code>usage</code> token object — <b style="color:var(--red)">it is discarded</b>.</div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--red)">6</span><b>Training Simulator</b><span class="he">סימולטור</span><span class="spacer"></span><span class="b b-user">per participant message</span><span class="b b-usage">usage</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v">Interactive: <code>sim_commandCenter</code> fires <b>gpt-4o on every trainee message</b> (max_tokens 300); <code>sim_refereeEvaluate</code> makes 3 calls per evaluation (gpt-4o-mini ×2 + gpt-4o); <code>sim_generateFinalFeedback</code> one gpt-4o call per session end.</div>
+      <div class="k">API</div><div class="v">OpenAI SDK (<code>npm:openai</code>) + direct fetch, <code>OPENAI_API_KEY</code>.</div>
+      <div class="k">What is sent / received</div><div class="v">Scenario context, personas, trainee messages → JSON verdicts / Hebrew feedback text. Training data, not real-case PII.</div>
+      <div class="k">Cost shape</div><div class="v">Scales with <b>session count × messages per trainee</b> — a busy training day is the likeliest cost spike in the app.</div>
+      <div class="k">Logged today</div><div class="v">Nothing. <code>usage</code> from the SDK response is available and unread.</div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--green)">7</span><b>Backoffice Assistant Agent</b><span class="he">עוזר בקאופיס</span><span class="spacer"></span><span class="b b-user">per chat message</span><span class="b b-credits">credits</span><span class="b b-pii">PII</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v">Users chatting with the platform agent <code>backoffice_assistant</code>.</div>
+      <div class="k">API / model</div><div class="v">Base44 agent runtime, model <b>gpt_5_5</b>, with read/write tool access to CaseManagement, MissingPerson, Interview, Personnel, UnitPersonnel and more.</div>
+      <div class="k">Cost shape</div><div class="v">Each user message can chain multiple tool calls + LLM turns — the most expensive "single message" in the system.</div>
+      <div class="k">Logged today</div><div class="v">Platform-side conversation history only; no cost surface in the app. Instrumentation must come from the Base44 usage dashboard (no in-code hook exists for agents).</div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="fam">
+    <div class="fam-h"><span class="idx" style="background:var(--muted)">8</span><b>Inventory OCR</b><span class="he">קליטת מלאי</span><span class="spacer"></span><span class="b b-user">user-triggered</span><span class="b b-credits">credits</span></div>
+    <div class="fam-grid">
+      <div class="k">Trigger &amp; caller</div><div class="v"><code>LogisticsInventoryCount.jsx</code> — <b>frontend</b> call to <code>Core.ExtractDataFromUploadedFile</code> per uploaded count sheet.</div>
+      <div class="k">Note</div><div class="v">The only LLM-backed integration invoked from the client. Fine functionally, but it bypasses any backend metering — route it through a function when instrumenting.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. GAPS ============ -->
+<section id="gaps">
+  <div class="sec-k">Part 3</div>
+  <h2>What's broken about cost visibility today</h2>
+  <div class="gaps">
+    <div class="gap"><b>Every cost field is a hard-coded zero</b><p><code>input_token_estimate: 0, output_token_estimate: 0, cost_estimate_usd: 0</code> appears verbatim in all three analysis workers. The schema promised tracking; the code never delivered it.</p></div>
+    <div class="gap"><b>Exact token counts are received and thrown away</b><p>Every direct OpenAI response carries a <code>usage</code> object with precise input/output tokens. Not one call site reads it. Half the ledger is free — it's already in the responses.</p></div>
+    <div class="gap"><b>Five of eight families have no record at all</b><p>Transcription, voice notes, translations, simulator, and the agent leave no cost/usage trace. Only case analysis writes anything (zeros) to <code>AIAnalysis</code>.</p></div>
+    <div class="gap"><b>No timing anywhere</b><p>No call records when it started, finished, or how long the provider took — you asked for "time received"; today it exists only in ephemeral console logs.</p></div>
+    <div class="gap"><b>Unattended spend paths</b><p>Inbound voice notes and every interview save spend money with no cap, no alert, no owner. Cost is drivable from outside the organization.</p></div>
+    <div class="gap"><b>Triplicated analysis workers</b><p><code>queueAnalysis</code>, <code>runWorker</code>, <code>ai/runWorker</code> maintain near-identical prompt/call logic. Instrumenting means touching all three — and is an argument to converge them.</p></div>
+  </div>
+  <div class="warn">⚠ <b>Base44 credit opacity:</b> <code>InvokeLLM</code>, the agent, emails and OCR bill in credits, and it is not yet verified whether <code>InvokeLLM</code> returns token usage to the caller. Step 1 of the build is a probe: log a raw <code>InvokeLLM</code> response and check. If usage isn't exposed, those calls get estimated tokens (chars÷4) and a credits-based price, with the platform's usage dashboard as ground truth.</div>
+</section>
+
+<!-- ============ 4. CAPABILITY ============ -->
+<section id="capability">
+  <div class="sec-k">Part 4</div>
+  <h2>The capability: a per-call LLM ledger</h2>
+  <p class="sec-lede">One shared metering module wraps every LLM call. It never blocks or fails the real call — it times it, captures payloads and usage, prices it, and writes one <code>LLMCallLog</code> row. An admin page reads the ledger.</p>
+
+  <div class="pipe">
+    <div class="pnode"><b>Call site</b><span>any of the ~15 sites, unchanged business logic</span></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><b>llmMeter.ts</b><span>starts clock · forwards call · reads <code>usage</code> or estimates · prices it</span></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><b>Provider</b><span>Base44 InvokeLLM · OpenAI · Soniox</span></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><b>LLMCallLog</b><span>one row per call, fire-and-forget write</span></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><b>Admin ledger UI</b><span>drill-in, rollups, alerts, XLSX</span></div>
+  </div>
+
+  <h3>New entity — <code>base44/entities/LLMCallLog.jsonc</code></h3>
+  <pre><code>{
+  "name": "LLMCallLog",
+  "properties": {
+    "called_at_utc":     { "type": "string", "format": "datetime-local" },   // request sent
+    "completed_at_utc":  { "type": "string", "format": "datetime-local" },   // response received
+    "duration_ms":       { "type": "number" },
+    "status":            { "enum": ["success", "error", "fallback"] },
+    "error_message":     { "type": "string" },
+
+    "call_family":       { "enum": ["ניתוח אירוע","סיכום תשאול","תמלול","הקלטת וואטסאפ",
+                                    "תרגום","סימולטור","קליטת מלאי","אחר"] },
+    "function_name":     { "type": "string" },                // e.g. "processInterviewSummary"
+    "triggered_by":      { "type": "string" },                // user email | "workflow" | "inbound-whatsapp"
+    "case_id":           { "type": "string" },                // optional, business key
+
+    "api":               { "enum": ["base44_invoke_llm","openai_chat","openai_audio",
+                                    "soniox_stt","base44_extract_file"] },
+    "provider":          { "type": "string" },                // openai | soniox | base44-routed
+    "model_requested":   { "type": "string" },
+    "model_used":        { "type": "string" },                // after fallbacks
+
+    "request_payload":   { "type": "string" },                // full prompt / audio URL (see PII note)
+    "response_payload":  { "type": "string" },                // full response text/JSON
+    "request_chars":     { "type": "number" },
+    "response_chars":    { "type": "number" },
+    "audio_seconds":     { "type": "number" },                // STT calls
+
+    "input_tokens":      { "type": "number" },
+    "output_tokens":     { "type": "number" },
+    "tokens_source":     { "enum": ["api_usage","estimated"] },
+    "cost_usd":          { "type": "number" },
+    "cost_source":       { "enum": ["usage_pricing","estimated","credits_opaque"] },
+
+    "client_request_id": { "type": "string", "unique": true }
+  },
+  "required": ["called_at_utc","call_family","function_name","api","client_request_id"]
+}</code></pre>
+  <div class="note">🔐 <b>PII decision, made deliberately:</b> storing full request/response follows the existing precedent (<code>AIAnalysis.final_prompt</code> already stores complete case prompts). Entity permissions restrict <code>LLMCallLog</code> to admins, and a retention job purges payload fields (keeping the numeric row) after a configurable window — proposed 90 days.</div>
+
+  <h3>Shared wrapper — <code>base44/shared/llmMeter.ts</code></h3>
+  <pre><code>// One module, four wrappers, zero behavior change on the happy path.
+export async function meteredInvokeLLM(base44, params, meta)   // wraps Core.InvokeLLM
+export async function meteredOpenAIChat(payload, meta)         // wraps /v1/chat/completions — reads usage
+export async function meteredOpenAIAudio(form, meta)           // wraps /v1/audio/transcriptions
+export async function meteredSonioxStt(base44, args, meta)     // wraps runSonioxTranscription
+
+// meta = { call_family, function_name, triggered_by, case_id }
+// Contract: start clock → forward the call untouched → on settle:
+//   tokens  = response.usage ?? Math.ceil(chars / 4)        (tokens_source records which)
+//   cost    = pricing[model] applied to tokens/audio_seconds
+//   write LLMCallLog via asServiceRole — inside its own try/catch:
+//   a metering failure must NEVER fail or slow the real call.</code></pre>
+
+  <h3>Pricing — data, not code</h3>
+  <p>Prices live in a <code>SystemSetting</code> key <code>llm_pricing_json</code>, editable from the admin page: per-model USD per 1M input/output tokens, per-hour STT rates, and a credits-per-call figure for Base44-billed integrations. Shipped empty with the model names found in this audit (gpt-4o, gpt-4o-mini, gpt_5_mini, gpt_5_5, whisper-1, gpt-4o-mini-transcribe, stt-async-preview, plus the Claude/Gemini options in AISettings) — <b>values filled from the providers' current price lists at implementation time</b>, never hard-coded in functions. Unknown model ⇒ cost logged as null, row flagged, never a made-up number.</p>
+
+  <h3>Retrofit map — 15 call sites → wrappers</h3>
+  <div class="scroll"><table class="t">
+    <tr><th>File</th><th>Calls</th><th>Wrapper</th></tr>
+    <tr><td><code>queueAnalysis/entry.ts</code></td><td>chunk loop + final + fallback (3 sites)</td><td><code>meteredInvokeLLM</code></td></tr>
+    <tr><td><code>runWorker</code> / <code>ai/runWorker</code></td><td>2 sites each — and propose converging on one worker</td><td><code>meteredInvokeLLM</code></td></tr>
+    <tr><td><code>shared/interviewAnalysis.ts</code></td><td>2 sites (analysis + insights)</td><td><code>meteredInvokeLLM</code></td></tr>
+    <tr><td><code>processTranslationJob(s)</code></td><td>2 sites each</td><td><code>meteredOpenAIChat</code></td></tr>
+    <tr><td><code>sim_commandCenter / sim_refereeEvaluate / sim_generateFinalFeedback</code></td><td>1 + 3 + 1 sites</td><td><code>meteredOpenAIChat</code></td></tr>
+    <tr><td><code>transcribeInterviewAndCreateRecord</code></td><td>audio + chat post-step</td><td><code>meteredOpenAIAudio</code> + <code>meteredOpenAIChat</code></td></tr>
+    <tr><td><code>shared/sonioxTranscription.ts</code></td><td>STT + <code>translateWithOpenAI</code></td><td><code>meteredSonioxStt</code> + <code>meteredOpenAIChat</code></td></tr>
+    <tr><td><code>LogisticsInventoryCount.jsx</code></td><td>1 frontend site</td><td>move behind a new function using <code>meteredExtract</code></td></tr>
+    <tr><td><code>backoffice_assistant</code> agent</td><td>—</td><td>not instrumentable in code; tracked via platform dashboard + a manual monthly figure in the cost page</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 5. ADMIN UI ============ -->
+<section id="ui">
+  <div class="sec-k">Part 5</div>
+  <h2>Admin UI — <code>LLMUsage.jsx</code></h2>
+  <p class="sec-lede">Admin-gated like SystemAdmin, RTL, React Query v5, linked from the SystemAdmin header next to AISettings. The ledger table drills into a dialog showing the full request/response of a single call. Filters: date range, family, model, case, status. XLSX export of the filtered ledger.</p>
+
+  <div class="frame">
+    <div class="frame-bar"><i></i><i></i><i></i><span>missing.org.il — ניהול מערכת ▸ שימוש ב-AI</span></div>
+    <div class="mock">
+      <div class="mh">
+        <div><h4>שימוש ועלויות AI</h4><div class="msub">יומן קריאות מלא · ספטמבר 2026</div></div>
+        <div class="msp"></div>
+        <span class="mbtn">⬇ ייצוא XLSX</span>
+        <span class="mbtn">תמחור מודלים ⚙</span>
+      </div>
+      <div class="mkpis">
+        <div class="mkpi"><div class="l">עלות מצטברת החודש</div><div class="v">$41.86</div><div class="d">≈ ₪156 · לפי תמחור ספקים</div></div>
+        <div class="mkpi"><div class="l">קריאות היום</div><div class="v">63</div><div class="d">מתוכן 51 אוטומטיות</div></div>
+        <div class="mkpi"><div class="l">זמן תגובה חציוני</div><div class="v">6.4s</div><div class="d">P95: 28s (ניתוח אירוע)</div></div>
+        <div class="mkpi"><div class="l">צרכן מוביל</div><div class="v">תמלול</div><div class="d">$19.20 · 3.1 שעות אודיו</div></div>
+      </div>
+      <div style="overflow-x:auto"><table class="mt">
+        <tr><th>זמן</th><th>מקור</th><th>מופעל ע״י</th><th>API</th><th>מודל</th><th>טוקנים ⇄</th><th>משך</th><th>עלות</th><th>סטטוס</th><th></th></tr>
+        <tr><td class="num">14:32:08</td><td><span class="mpill src1">ניתוח אירוע</span></td><td>shlomi@…</td><td>InvokeLLM</td><td>gpt-4o</td><td class="num">21,480 / 1,920</td><td class="num">24.1s</td><td class="num">$0.073</td><td><span class="mpill ok">הצלחה</span></td><td>🔍</td></tr>
+        <tr><td class="num">14:31:44</td><td><span class="mpill src2">סיכום תשאול</span></td><td>workflow</td><td>InvokeLLM</td><td>gpt_5_mini</td><td class="num">6,210 / 840</td><td class="num">5.8s</td><td class="num">$0.011</td><td><span class="mpill ok">הצלחה</span></td><td>🔍</td></tr>
+        <tr><td class="num">13:58:02</td><td><span class="mpill src3">תמלול</span></td><td>workflow</td><td>Soniox</td><td>stt-async-preview</td><td class="num">— · 22:40 דק׳</td><td class="num">96s</td><td class="num">$0.420</td><td><span class="mpill ok">הצלחה</span></td><td>🔍</td></tr>
+        <tr><td class="num">13:41:19</td><td><span class="mpill src4">הקלטת וואטסאפ</span></td><td>inbound</td><td>Soniox</td><td>stt-async-preview</td><td class="num">— · 3:05 דק׳</td><td class="num">18s</td><td class="num">$0.058</td><td><span class="mpill ok">הצלחה</span></td><td>🔍</td></tr>
+        <tr><td class="num">12:15:37</td><td><span class="mpill src5">סימולטור</span></td><td>y.mizrahi@…</td><td>OpenAI</td><td>gpt-4o</td><td class="num">1,320 / 260</td><td class="num">2.1s</td><td class="num">$0.006</td><td><span class="mpill ok">הצלחה</span></td><td>🔍</td></tr>
+        <tr><td class="num">11:02:50</td><td><span class="mpill src1">ניתוח אירוע</span></td><td>d.levi@…</td><td>InvokeLLM</td><td>claude-sonnet-5</td><td class="num">מוערך: ~18k / —</td><td class="num">31.5s</td><td class="num">שגיאה</td><td><span class="mpill err">נכשל → gpt-4o</span></td><td>🔍</td></tr>
+      </table></div>
+      <div class="msub" style="margin-top:8px">🔍 פותח חלון פירוט: הפרומפט המלא שנשלח, התשובה המלאה, זמני שליחה/קבלה, ומקור התמחור.</div>
+    </div>
+  </div>
+
+  <p>Rollup views on the same page (recharts, validated palette): daily cost line for the month, cost by family, cost by model — plus a configurable <b>daily budget alert</b>: when the day's metered total crosses a <code>SystemSetting</code> threshold, notify admins (WhatsApp via the existing Green API path).</p>
+</section>
+
+<!-- ============ 6. ROLLOUT ============ -->
+<section id="rollout">
+  <div class="sec-k">Part 6</div>
+  <h2>Rollout — safe order, small PRs</h2>
+  <ol class="steps">
+    <li><b>Probe InvokeLLM.</b> One temporary log of a raw response to learn whether Base44 exposes token usage. Determines <code>tokens_source</code> for half the ledger. <i>(5-minute experiment, drives the design.)</i></li>
+    <li><b>Ship the ledger core:</b> <code>LLMCallLog</code> entity + <code>llmMeter.ts</code> + <code>llm_pricing_json</code> setting. No call sites touched yet — zero production risk.</li>
+    <li><b>Instrument the direct-OpenAI sites first</b> (translations, simulator, transcription) — exact <code>usage</code> tokens, immediate accurate dollars.</li>
+    <li><b>Instrument the InvokeLLM sites</b> (case analysis, interview summaries) and backfill <code>AIAnalysis.cost_estimate_usd</code> from real numbers instead of 0.</li>
+    <li><b>Ship <code>LLMUsage.jsx</code></b> — ledger, drill-in, rollups, pricing editor, XLSX.</li>
+    <li><b>Guardrails:</b> daily-budget alert, voice-note duration cap, retention purge job.</li>
+    <li><b>Cleanup (separate PR):</b> converge the three duplicate analysis workers; route inventory OCR through a backend function.</li>
+  </ol>
+
+  <h3>Open decisions</h3>
+  <div class="scroll"><table class="t">
+    <tr><th>Decision</th><th>Proposed default</th></tr>
+    <tr><td>Store full prompts/responses in the ledger?</td><td>Yes (admin-only entity, 90-day payload retention) — matches the <code>AIAnalysis.final_prompt</code> precedent. Alternative: first 2,000 chars.</td></tr>
+    <tr><td>Voice-note transcription cap</td><td>Skip files &gt; 15 minutes with an admin notification, rather than transcribing unconditionally.</td></tr>
+    <tr><td>Daily budget alert threshold</td><td>$10/day to start; tune after two weeks of real data.</td></tr>
+    <tr><td>Backfill history?</td><td>No — old <code>AIAnalysis</code> rows keep their zeros with a "pre-ledger" marker; the ledger starts clean.</td></tr>
+    <tr><td>Converge the triplicated workers now or later?</td><td>Later, separate PR — instrumentation first, refactor second (minimize production diff).</td></tr>
+  </table></div>
+</section>
+
+<footer>
+  Audit performed against the working tree on branch <code>shlomi/new-logos</code> · 07.09.2026 · All file references verified in code. Prices intentionally not hard-coded anywhere — the pricing table is data, filled at implementation time. Design note: figures shown in the UI mock are illustrative.
+</footer>
+
+</div>
+</body>
+</html>
