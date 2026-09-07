@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>חמ״ל עלויות — דשבורד מלא</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Secular+One&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#04060c; --cell:#0d1422; --cellb:#1c2942; --ink:#dce6f5; --mut:#8ba3c7; --dim:#4c6285; --lab:#6f87ad;
+    --blue:#37a8ff; --blue-d:#1c5f9e; --amber:#ffb84d; --amber-d:#c07a00; --aqua:#2fd6a3; --red:#ff7d7d;
+    --mono:"JetBrains Mono",monospace; --disp:"Secular One";
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Heebo",system-ui,sans-serif;position:relative}
+  body::before{content:"";position:fixed;inset:0;background:
+    radial-gradient(900px 400px at 82% -10%, rgba(38,169,255,.13), transparent 60%),
+    radial-gradient(700px 340px at 12% 108%, rgba(237,161,0,.07), transparent 60%);pointer-events:none;z-index:0}
+  .wrap{max-width:1280px;margin:0 auto;padding:24px 26px 70px;position:relative;z-index:1}
+
+  .hd{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .live{display:inline-flex;align-items:center;gap:7px;background:rgba(38,169,255,.12);border:1px solid rgba(38,169,255,.4);color:#5fc3ff;border-radius:99px;padding:4px 13px;font-size:11px;font-weight:700;letter-spacing:.08em}
+  .live b{width:7px;height:7px;border-radius:50%;background:#37e08b;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  h1{font-family:var(--disp);font-size:26px;margin:0;color:#fff;font-weight:400}
+  .hd .meta{color:var(--dim);font-size:12px}
+  .clock{margin-inline-start:auto;font-family:var(--mono);font-size:13px;color:#5fc3ff;direction:ltr}
+  .hbtn{border:1px solid var(--cellb);background:rgba(13,20,34,.7);color:var(--mut);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:"Heebo"}
+  .hbtn:hover{color:#fff;border-color:#2b3f66}
+
+  .alert{margin:16px 0;border:1px solid rgba(255,90,90,.45);background:rgba(255,60,60,.08);border-radius:10px;padding:10px 16px;font-size:13px;color:#ffb3b3;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .alert b{color:var(--red)}
+  .alert .go{margin-inline-start:auto;color:#5fc3ff;cursor:pointer;white-space:nowrap}
+
+  .grid{display:grid;gap:14px;margin-bottom:14px}
+  .g3{grid-template-columns:1.15fr .9fr 1.4fr}
+  .g2a{grid-template-columns:1.5fr 1fr}
+  .g2b{grid-template-columns:1fr 1.15fr}
+  .g3s{grid-template-columns:1.2fr 1fr 1fr}
+  @media(max-width:940px){.g3,.g2a,.g2b,.g3s{grid-template-columns:1fr}}
+  .cell{background:rgba(13,20,34,.78);border:1px solid var(--cellb);border-radius:14px;padding:18px 20px;position:relative}
+  .lab{font-size:10.5px;letter-spacing:.18em;color:var(--lab);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .lab .info{margin-inline-start:auto;color:var(--dim);letter-spacing:0;font-weight:400;font-size:10.5px}
+  .big{font-family:var(--disp);font-size:54px;line-height:1;color:#fff;text-shadow:0 0 26px rgba(95,195,255,.35)}
+  .big small{font-size:22px;color:#5fc3ff}
+  .sub{color:var(--mut);font-size:12px;margin-top:8px}
+  .srcrow{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed var(--cellb)}
+  .srcrow:last-child{border:none}
+  .srcrow b{font-family:var(--mono);color:#fff;direction:ltr}
+
+  /* daily columns */
+  .cols{display:flex;align-items:flex-end;gap:14px;height:120px;direction:ltr;padding-top:26px}
+  .c{width:26px;background:linear-gradient(180deg,var(--blue),var(--blue-d));border-radius:4px 4px 0 0;position:relative;box-shadow:0 0 14px rgba(55,168,255,.3);transition:height .8s cubic-bezier(.2,.8,.2,1)}
+  .c.hot{background:linear-gradient(180deg,var(--amber),var(--amber-d));box-shadow:0 0 16px rgba(255,184,77,.4)}
+  .c i{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-style:normal;font-family:var(--mono);font-size:10px;color:var(--mut);padding-bottom:4px}
+  .xx{display:flex;gap:14px;direction:ltr;padding-top:6px}
+  .xx span{width:26px;text-align:center;font-size:9.5px;color:var(--dim);font-family:var(--mono)}
+  .fam{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#b9cbe6;padding:6px 0}
+  .fam .bar{flex:1;margin:0 12px;height:5px;border-radius:3px;background:#14203a;direction:ltr}
+  .fam .bar i{display:block;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue-d),var(--blue));float:right}
+  .fam b{font-family:var(--mono);color:#fff;direction:ltr}
+
+  svg text{font-family:var(--mono)}
+  .axis{stroke:#1c2942;stroke-width:1}
+  .gtxt{fill:var(--dim);font-size:9.5px}
+
+  /* heatmap */
+  .hm{direction:ltr}
+  .hmrow{display:flex;gap:3px;margin-bottom:3px;align-items:center}
+  .hmlab{width:26px;font-size:9.5px;color:var(--dim);font-family:var(--mono);text-align:right;padding-inline-end:4px;direction:rtl}
+  .hmc{flex:1;aspect-ratio:1.35/1;border-radius:2.5px;background:#0a1120;min-width:0}
+  .hmc.i1{background:#123054}.hmc.i2{background:#1a5288;box-shadow:0 0 4px rgba(55,168,255,.15)}
+  .hmc.i3{background:#2585d8;box-shadow:0 0 7px rgba(55,168,255,.3)}
+  .hmc.i4{background:#5fc3ff;box-shadow:0 0 10px rgba(95,195,255,.55)}
+  .hmc.a1{background:#4a3410}.hmc.a2{background:#8a5f10;box-shadow:0 0 6px rgba(255,184,77,.3)}
+  .hmx{display:flex;gap:3px;margin-top:2px}
+  .hmx b{width:26px}
+  .hmx span{flex:1;text-align:center;font-size:8.5px;color:var(--dim);font-family:var(--mono);min-width:0}
+  .hmleg{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--mut);align-items:center;flex-wrap:wrap}
+  .hmleg .sc{display:flex;gap:3px}
+  .hmleg .sc i{width:13px;height:11px;border-radius:2.5px;display:block}
+
+  /* dumbbell */
+  .db{margin:11px 0}
+  .db .nm{display:flex;justify-content:space-between;font-size:12px;color:#b9cbe6;margin-bottom:3px}
+  .db .nm b{font-family:var(--mono);color:var(--mut);font-weight:400;direction:ltr}
+  .db .tr{height:16px;background:#0a1120;border-radius:8px;position:relative;direction:ltr}
+  .db .rng{position:absolute;top:5px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--aqua),var(--amber));opacity:.85}
+  .db .p50,.db .p95{position:absolute;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid #04060c}
+  .db .p50{background:var(--aqua);box-shadow:0 0 8px rgba(47,214,163,.5)}
+  .db .p95{background:var(--amber);box-shadow:0 0 8px rgba(255,184,77,.5)}
+
+  /* unit econ */
+  .ue{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .uet{background:#0a1120;border:1px solid var(--cellb);border-radius:10px;padding:11px 14px}
+  .uet .k{font-size:11px;color:var(--lab)}
+  .uet .v{font-family:var(--disp);font-size:22px;color:#fff;margin-top:2px}
+  .uet .d{font-size:10.5px;margin-top:1px;font-family:var(--mono)}
+  .uet .d.up{color:var(--red)}.uet .d.dn{color:var(--aqua)}
+
+  /* split bar */
+  .split{height:30px;border-radius:8px;overflow:hidden;display:flex;direction:ltr;border:1px solid var(--cellb)}
+  .split .a{background:linear-gradient(90deg,var(--blue-d),var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11.5px;color:#031326;font-weight:700}
+  .split .h{background:#14203a;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11.5px;color:var(--mut)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+  .legend span{font-size:11.5px;color:#b9cbe6;display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  .secttl{font-family:var(--disp);font-size:16px;color:#5fc3ff;letter-spacing:.04em;margin:26px 0 12px;display:flex;align-items:center;gap:12px}
+  .secttl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#1c2942,transparent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <span class="live"><b></b> LIVE</span>
+    <h1>חמ״ל עלויות</h1>
+    <span class="meta">ספטמבר 2026 · כל היחידות</span>
+    <span class="clock" id="clk">14:37:02 IST</span>
+    <button class="hbtn">יומן קריאות</button>
+    <button class="hbtn">⚙ תמחור</button>
+  </div>
+
+  <div class="alert">⚠ <span><b>חריגת תמלול:</b> הקלטת וואטסאפ 22:40 דק׳ — מעל תקרת 15 דק׳ · $0.42 · אתמול 13:58</span><span class="go">פתח ביומן ←</span></div>
+
+  <!-- row 1: the approved trio -->
+  <div class="grid g3">
+    <div class="cell">
+      <div class="lab">סה״כ עלויות API · החודש</div>
+      <div class="big">41.86<small> $</small></div>
+      <div class="sub">≈ ₪156 · 1,847 קריאות · ▲12% מול אוגוסט</div>
+      <div style="margin-top:14px">
+        <div class="srcrow"><span>OpenAI API</span><b>$14.31</b></div>
+        <div class="srcrow"><span>Soniox STT</span><b>$19.20</b></div>
+        <div class="srcrow"><span>Base44 credits</span><b>~$8.35</b></div>
+        <div class="srcrow"><span>PDF Monkey · מכסת דוחות</span><b>118/300</b></div>
+        <div class="srcrow"><span>מנויים קבועים</span><b>₪668</b></div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="lab">תקציב יומי</div>
+      <svg width="150" height="96" viewBox="0 0 150 96">
+        <path d="M14 88 A61 61 0 0 1 136 88" fill="none" stroke="#14203a" stroke-width="11" stroke-linecap="round"/>
+        <path d="M14 88 A61 61 0 0 1 108 34" fill="none" stroke="#37a8ff" stroke-width="11" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(55,168,255,.6))"/>
+        <text x="75" y="72" text-anchor="middle" fill="#fff" font-size="24" font-family="Secular One">58%</text>
+        <text x="75" y="90" text-anchor="middle" fill="#6f87ad" font-size="10">$5.76 / $10</text>
+      </svg>
+      <div class="sub">81% מהקריאות היום — אוטומטיות (51/63)</div>
+      <div class="lab" style="margin-top:16px">צרכן מוביל היום</div>
+      <div style="font-size:15px;color:#fff;font-weight:700">תמלול תשאולים · <span style="font-family:var(--mono)">$2.20</span></div>
+    </div>
+    <div class="cell">
+      <div class="lab">עלות יומית · 7 ימים</div>
+      <div class="cols" id="cols">
+        <div class="c" data-h="52"><i>5.4</i></div>
+        <div class="c" data-h="64"><i>6.6</i></div>
+        <div class="c" data-h="30"><i>3.1</i></div>
+        <div class="c hot" data-h="93"><i>9.6</i></div>
+        <div class="c" data-h="39"><i>4.0</i></div>
+        <div class="c" data-h="72"><i>7.4</i></div>
+        <div class="c" data-h="56"><i>5.8</i></div>
+      </div>
+      <div class="xx"><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span></div>
+      <div class="lab" style="margin-top:12px">לפי מקור</div>
+      <div class="fam"><span>תמלול</span><span class="bar"><i style="width:100%"></i></span><b>$19.20</b></div>
+      <div class="fam"><span>ניתוח אירוע</span><span class="bar"><i style="width:49%"></i></span><b>$9.40</b></div>
+      <div class="fam"><span>סיכום תשאול</span><span class="bar"><i style="width:31%"></i></span><b>$5.90</b></div>
+      <div class="fam"><span>סימולטור</span><span class="bar"><i style="width:17%"></i></span><b>$3.20</b></div>
+    </div>
+  </div>
+
+  <div class="secttl">ניתוח מתקדם</div>
+
+  <!-- row 2: burn + heatmap -->
+  <div class="grid g2a">
+    <div class="cell">
+      <div class="lab">קצב שריפה מצטבר מול תקציב <span class="info">תחזית = קצב 7 הימים האחרונים</span></div>
+      <svg viewBox="0 0 600 218" width="100%" style="direction:ltr">
+        <line x1="30" y1="127" x2="586" y2="127" class="axis"/><text x="4" y="130" class="gtxt">$100</text>
+        <line x1="30" y1="63"  x2="586" y2="63"  class="axis"/><text x="4" y="66" class="gtxt">$200</text>
+        <line x1="30" y1="190" x2="586" y2="190" stroke="#2b3f66" stroke-width="1.2"/>
+        <!-- budget pace -->
+        <line x1="30" y1="190" x2="586" y2="0" stroke="#4c6285" stroke-width="1.5" stroke-dasharray="2 5"/>
+        <text x="440" y="34" class="gtxt" fill="#6f87ad">קצב תקציב · $300/חודש</text>
+        <!-- forecast -->
+        <line x1="156" y1="163.5" x2="586" y2="76.7" stroke="#ffb84d" stroke-width="2" stroke-dasharray="6 6" opacity=".85"/>
+        <circle cx="586" cy="76.7" r="4.5" fill="#ffb84d"/>
+        <text x="514" y="66" class="gtxt" fill="#ffb84d" font-size="11">תחזית ~$179</text>
+        <!-- actual -->
+        <polyline points="48,186.6 66,182.4 84,180.4 102,174.4 120,171.8 138,167.2 156,163.5" fill="none" stroke="#37a8ff" stroke-width="3" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(55,168,255,.6))"/>
+        <circle cx="156" cy="163.5" r="5" fill="#37a8ff" stroke="#04060c" stroke-width="2"/>
+        <text x="126" y="150" fill="#fff" font-size="12" font-family="Secular One">$41.86</text>
+        <text x="48" y="207" class="gtxt">01.09</text><text x="146" y="207" class="gtxt">07.09</text><text x="384" y="207" class="gtxt">20.09</text><text x="556" y="207" class="gtxt">30.09</text>
+      </svg>
+      <div class="sub" style="margin-top:2px">בקצב הנוכחי החודש ייסגר על <b style="color:var(--amber)">~$179</b> — 60% מתחת לתקרת התקציב ($300). מרווח בטוח גם אם יתווסף אירוע גדול (+$12 ליום ממוצע).</div>
+    </div>
+    <div class="cell">
+      <div class="lab">מפת חום · מתי נשרף הכסף <span class="info">שעה × יום · עומק צבע = $</span></div>
+      <div class="hm" id="hm"></div>
+      <div class="hmleg">
+        <span class="sc"><i style="background:#0a1120"></i><i style="background:#123054"></i><i style="background:#1a5288"></i><i style="background:#2585d8"></i><i style="background:#5fc3ff"></i></span>
+        <span>$0 → $1.2/שעה</span>
+        <span><i style="width:13px;height:11px;border-radius:2.5px;background:#8a5f10;display:inline-block"></i> קרון תרגומים 03:00</span>
+      </div>
+      <div class="sub" style="margin-top:8px">היום החם: <b style="color:#5fc3ff">04.09 · 09:00–13:00</b> (יום תשאולים) · פס ה־03:00 = polling מתוזמן שרץ גם בלילות שקטים — מועמד לצמצום תדירות.</div>
+    </div>
+  </div>
+
+  <!-- row 3: sankey + bubbles -->
+  <div class="grid g2b">
+    <div class="cell">
+      <div class="lab">לאן זורם כל דולר · ספק ← שימוש</div>
+      <svg id="sankey" viewBox="0 0 540 320" width="100%" style="direction:ltr"></svg>
+    </div>
+    <div class="cell">
+      <div class="lab">עלות מול משך אירוע <span class="info">גודל בועה = מס׳ קריאות</span></div>
+      <svg viewBox="0 0 540 230" width="100%" style="direction:ltr">
+        <line x1="40" y1="190" x2="520" y2="190" stroke="#2b3f66"/>
+        <line x1="40" y1="15" x2="40" y2="190" stroke="#2b3f66"/>
+        <text x="6" y="30" class="gtxt">$12</text><text x="6" y="105" class="gtxt">$6</text><text x="500" y="207" class="gtxt">14 ימים</text><text x="44" y="207" class="gtxt">0</text>
+        <circle cx="97"  cy="124" r="10"  fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="64"  cy="162" r="6"   fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="131" cy="144" r="8"   fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="198" cy="154" r="6.5" fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="332" cy="95"  r="11"  fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="433" cy="133" r="8.5" fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="232" cy="72"  r="13"  fill="rgba(55,168,255,.35)" stroke="#37a8ff" stroke-width="1.5"/>
+        <circle cx="164" cy="26"  r="16"  fill="rgba(255,184,77,.3)"  stroke="#ffb84d" stroke-width="2" style="filter:drop-shadow(0 0 8px rgba(255,184,77,.5))"/>
+        <text x="186" y="24" fill="#ffb84d" font-size="11">מרים לוי · $11.20 · 4 ימים</text>
+        <text x="250" y="76" fill="#8ba3c7" font-size="10.5">יוסי כהן · $7.85</text>
+        <text x="349" y="99" fill="#8ba3c7" font-size="10.5">ר. חדד · $6.20</text>
+      </svg>
+      <div class="sub">העלות לא נקבעת לפי אורך האירוע אלא לפי <b style="color:#5fc3ff">נפח התשאולים והניתוחים</b> — אירוע של 4 ימים עקף אירוע של 12. חריג ענברי = מעל $2.5/יום.</div>
+    </div>
+  </div>
+
+  <!-- row 4: latency + unit econ + split -->
+  <div class="grid g3s">
+    <div class="cell">
+      <div class="lab">זמני תגובה · P50 → P95 <span class="info">שניות</span></div>
+      <div class="db"><div class="nm"><span>תמלול (Soniox)</span><b>45s → 110s</b></div><div class="tr"><span class="rng" style="left:37.5%;width:54%"></span><span class="p50" style="left:36.5%"></span><span class="p95" style="left:90%"></span></div></div>
+      <div class="db"><div class="nm"><span>ניתוח אירוע</span><b>8s → 31s</b></div><div class="tr"><span class="rng" style="left:6.7%;width:19.2%"></span><span class="p50" style="left:5.7%"></span><span class="p95" style="left:24.8%"></span></div></div>
+      <div class="db"><div class="nm"><span>סיכום תשאול</span><b>4s → 9s</b></div><div class="tr"><span class="rng" style="left:3.3%;width:4.2%"></span><span class="p50" style="left:2.3%"></span><span class="p95" style="left:6.5%"></span></div></div>
+      <div class="db"><div class="nm"><span>סימולטור</span><b>1.5s → 3s</b></div><div class="tr"><span class="rng" style="left:1.2%;width:1.3%"></span><span class="p50" style="left:0.4%"></span><span class="p95" style="left:1.6%"></span></div></div>
+      <div class="db"><div class="nm"><span>תרגומים</span><b>0.9s → 2.2s</b></div><div class="tr"><span class="rng" style="left:.7%;width:1.1%"></span><span class="p50" style="left:0%"></span><span class="p95" style="left:1%"></span></div></div>
+      <div class="legend"><span><i style="background:var(--aqua)"></i>P50 חציוני</span><span><i style="background:var(--amber)"></i>P95</span></div>
+    </div>
+    <div class="cell">
+      <div class="lab">כלכלת יחידה <span class="info">עלות ממוצעת לפעולה</span></div>
+      <div class="ue">
+        <div class="uet"><div class="k">$ / תמלול תשאול</div><div class="v">$0.46</div><div class="d dn">▼ 8% · אודיו קצר יותר</div></div>
+        <div class="uet"><div class="k">$ / ניתוח אירוע</div><div class="v">$0.98</div><div class="d up">▲ 21% · הקשר אינטרנט</div></div>
+        <div class="uet"><div class="k">$ / סיכום תשאול</div><div class="v">$0.05</div><div class="d" style="color:var(--dim)">— יציב</div></div>
+        <div class="uet"><div class="k">$ / הודעת סימולטור</div><div class="v">$0.007</div><div class="d dn">▼ 3%</div></div>
+      </div>
+      <div class="sub" style="margin-top:10px">הניתוח התייקר בגלל <b style="color:var(--amber)">add_context_from_internet</b> — שווה בדיקה אם להפעיל רק לפי דרישה.</div>
+    </div>
+    <div class="cell">
+      <div class="lab">מי מוציא — אדם או מכונה?</div>
+      <div class="split">
+        <span class="a" style="width:67%">$28.10 · אוטומטי</span>
+        <span class="h" style="width:33%">$13.76 · ביוזמת אדם</span>
+      </div>
+      <div class="sub" style="margin-top:10px">67% מהכסף נשרף בלי החלטה אנושית: תמלולים, סיכומים, קרון תרגומים והקלטות נכנסות. אלה גם המועמדים היחידים ל<b style="color:#5fc3ff">מגבלות אוטומטיות</b> (תקרות, סינון, תדירות).</div>
+      <div class="lab" style="margin-top:16px">שלושת הווסתים המשתלמים</div>
+      <div class="fam"><span>תקרת 15 דק׳ להקלטה</span><b style="color:var(--aqua)">-$3.1/חו׳</b></div>
+      <div class="fam"><span>קרון תרגומים 03:00 → כל שעתיים</span><b style="color:var(--aqua)">-$0.9/חו׳</b></div>
+      <div class="fam"><span>אינטרנט בניתוח לפי דרישה</span><b style="color:var(--aqua)">-$1.6/חו׳</b></div>
+      <div class="fam"><span>דוחות PDF Monkey · 39% מהמכסה</span><b>118/300</b></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* live clock */
+setInterval(()=>{const d=new Date();document.getElementById('clk').textContent=d.toTimeString().slice(0,8)+' IST'},1000);
+
+/* animate daily columns */
+addEventListener('load',()=>{document.querySelectorAll('#cols .c').forEach(c=>{c.style.height='4px';requestAnimationFrame(()=>setTimeout(()=>c.style.height=c.dataset.h+'px',60))})});
+
+/* heatmap: 7 days × 24h */
+(function(){
+  const days=['01','02','03','04','05','06','07'];
+  const hot={'3':[9,10,11,12,13]}; // 04.09 index 3
+  const wrap=document.getElementById('hm');
+  let html='';
+  for(let d=0;d<7;d++){
+    html+='<div class="hmrow"><span class="hmlab">'+days[d]+'</span>';
+    for(let h=0;h<24;h++){
+      let cls='';
+      if(h===3)cls=(d===2||d===4)?'a1':'a2';                       // translation cron
+      else if(hot[d]&&hot[d].includes(h))cls='i4';
+      else if(h>=9&&h<=17){const v=(d*7+h)%5;cls=v>2?'i3':(v>0?'i2':'i1')}
+      else if(h>=18&&h<=21&&(d+h)%3===0)cls='i1';
+      else if(d===6&&h>=15)cls='';                                  // today, future hours
+      html+='<span class="hmc '+cls+'"></span>';
+    }
+    html+='</div>';
+  }
+  html+='<div class="hmx"><b></b>'+Array.from({length:24},(_,h)=>'<span>'+(h%6===0?String(h).padStart(2,'0'):'')+'</span>').join('')+'</div>';
+  wrap.innerHTML=html;
+})();
+
+/* sankey: sources (right) → families (left) */
+(function(){
+  const S=[{n:'Soniox',v:19.20,c:'#eb6834'},{n:'OpenAI',v:14.31,c:'#37a8ff'},{n:'Base44',v:8.35,c:'#2fd6a3'}];
+  const F=[{n:'תמלול',v:19.20},{n:'ניתוח אירוע',v:9.40},{n:'סיכום תשאול',v:5.90},{n:'סימולטור',v:3.20},{n:'תרגומים',v:1.80},{n:'וואטסאפ',v:1.60},{n:'אחר',v:0.76}];
+  const L=[[0,0,17.60],[0,5,1.60],[1,1,7.71],[1,3,3.20],[1,4,1.80],[1,0,1.60],[2,2,5.90],[2,1,1.69],[2,6,0.76]];
+  const H=290,GAP=8,px=(H-GAP*(F.length-1))/41.86, pxs=(H-GAP*(S.length-1))/41.86;
+  const xR=452,xL=88,W=36;
+  let y=10;S.forEach(s=>{s.y=y;s.h=s.v*pxs;s.off=0;y+=s.h+GAP});
+  y=10;F.forEach(f=>{f.y=y;f.h=f.v*px;f.off=0;y+=f.h+GAP});
+  let out='';
+  L.forEach(([si,fi,v])=>{
+    const s=S[si],f=F[fi],h1=v*pxs,h2=v*px;
+    const y1=s.y+s.off+h1/2, y2=f.y+f.off+h2/2;
+    s.off+=h1;f.off+=h2;
+    const mx=(xR+xL+W)/2;
+    out+='<path d="M'+xR+' '+y1+' C'+mx+' '+y1+' '+mx+' '+y2+' '+(xL+W)+' '+y2+'" stroke="'+s.c+'" stroke-width="'+Math.max(2.5,(h1+h2)/2)+'" fill="none" opacity=".38"/>';
+  });
+  S.forEach(s=>{out+='<rect x="'+xR+'" y="'+s.y+'" width="'+W+'" height="'+s.h+'" rx="4" fill="'+s.c+'"/>'+
+    '<text x="'+(xR+W+8)+'" y="'+(s.y+s.h/2+4)+'" fill="#dce6f5" font-size="11" font-family="Heebo">'+s.n+' · <tspan fill="#6f87ad" font-size="9.5">$'+s.v.toFixed(2)+'</tspan></text>'});
+  F.forEach(f=>{out+='<rect x="'+xL+'" y="'+f.y+'" width="'+W+'" height="'+Math.max(f.h,3)+'" rx="4" fill="#2b3f66"/>'+
+    '<text x="'+(xL-8)+'" y="'+(f.y+Math.max(f.h,3)/2+4)+'" fill="#dce6f5" font-size="10.5" text-anchor="end" font-family="Heebo">'+f.n+' · <tspan fill="#6f87ad" font-size="9.5">$'+f.v.toFixed(2)+'</tspan></text>'});
+  document.getElementById('sankey').innerHTML=out;
+})();
+</script>
+</body>
+</html>
