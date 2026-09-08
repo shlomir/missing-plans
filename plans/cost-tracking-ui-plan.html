@@ -279,8 +279,8 @@
       </div>
       <div class="src" onclick="go('ledger')">
         <div class="t"><span class="ic" style="background:#e2f5ed">⚡</span> קרדיטים Base44</div>
-        <div class="v">~$8.35</div>
-        <div class="d">136 קריאות InvokeLLM + OCR · מוערך</div>
+        <div class="v" style="direction:ltr;text-align:right">8,320<span style="font-size:14px;color:#6b7280"> / 50k</span></div>
+        <div class="d">אינטגרציה · בנייה 145/1.2k · חידוש 04.10</div>
         <span class="go">פירוט ←</span>
       </div>
       <div class="src" onclick="go('pricing')">
@@ -350,7 +350,7 @@
         <div class="legend">
           <span><i class="dot" style="background:var(--s1)"></i>OpenAI API</span>
           <span><i class="dot" style="background:var(--s2)"></i>Soniox STT</span>
-          <span><i class="dot" style="background:var(--s3)"></i>קרדיטים Base44 (מוערך)</span>
+          <span><i class="dot" style="background:var(--s3)"></i>קרדיטים Base44 · שווי $ מוערך</span>
         </div>
       </div>
 
@@ -392,9 +392,9 @@
           <tr><th>מודל</th><th>קריאות</th><th>טוקנים ⇄</th><th>עלות</th></tr>
           <tr><td>gpt-4o</td><td class="num">147</td><td class="num" style="direction:ltr;text-align:right">2.1M / 210K</td><td class="num" style="font-weight:700">$9.86</td></tr>
           <tr><td>stt-async-preview <span class="pill f2">אודיו</span></td><td class="num">61</td><td class="num">3.1 שעות</td><td class="num" style="font-weight:700">$19.20</td></tr>
-          <tr><td>gpt_5_mini <span class="pill f3">credits</span></td><td class="num">118</td><td class="num" style="direction:ltr;text-align:right">~740K / 96K</td><td class="num" style="font-weight:700">~$5.90</td></tr>
+          <tr><td>gpt_5_mini <span class="pill f3">credits</span></td><td class="num">118</td><td class="num" style="direction:ltr;text-align:right">~740K / 96K</td><td class="num" style="font-weight:700">~354 קר׳</td></tr>
           <tr><td>gpt-4o-mini</td><td class="num">1,478</td><td class="num" style="direction:ltr;text-align:right">3.4M / 490K</td><td class="num" style="font-weight:700">$4.45</td></tr>
-          <tr><td>gpt_5_5 <span class="pill f3">agent</span></td><td class="num">43</td><td class="num">—</td><td class="num" style="font-weight:700">~$0.30</td></tr>
+          <tr><td>gpt_5_5 <span class="pill f3">agent</span></td><td class="num">43</td><td class="num">—</td><td class="num" style="font-weight:700">~129 קר׳</td></tr>
         </table></div>
       </div>
     </div>
@@ -414,15 +414,15 @@
     <div class="panel" style="padding:0;overflow:hidden">
       <div class="scroll"><table class="t">
         <tr><th>זמן</th><th>מקור</th><th>מופעל ע״י</th><th>אירוע</th><th>API</th><th>מודל</th><th>טוקנים ⇄</th><th>משך</th><th>עלות</th><th>סטטוס</th><th></th></tr>
-        <tr class="click" onclick="openCall()"><td class="num">07.09 14:32:08</td><td><span class="pill f1">ניתוח אירוע</span></td><td>shlomi@…</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">ARAD…-001</td><td>InvokeLLM</td><td>gpt-4o</td><td class="num" style="direction:ltr;text-align:right">21,480 / 1,920 <span class="exact">✓</span></td><td class="num">24.1s</td><td class="num" style="font-weight:700">$0.073</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
-        <tr class="click" onclick="openCall()"><td class="num">07.09 14:31:44</td><td><span class="pill f2">סיכום תשאול</span></td><td>workflow</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">ARAD…-001</td><td>InvokeLLM</td><td>gpt_5_mini</td><td class="num" style="direction:ltr;text-align:right">6,210 / 840 <span class="est">≈</span></td><td class="num">5.8s</td><td class="num" style="font-weight:700">~$0.011</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
+        <tr class="click" onclick="openCall()"><td class="num">07.09 14:32:08</td><td><span class="pill f1">ניתוח אירוע</span></td><td>shlomi@…</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">ARAD…-001</td><td>InvokeLLM</td><td>gpt-4o</td><td class="num" style="direction:ltr;text-align:right">21,480 / 1,920 <span class="exact">✓</span></td><td class="num">24.1s</td><td class="num" style="font-weight:700">~15 קר׳</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
+        <tr class="click" onclick="openCall()"><td class="num">07.09 14:31:44</td><td><span class="pill f2">סיכום תשאול</span></td><td>workflow</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">ARAD…-001</td><td>InvokeLLM</td><td>gpt_5_mini</td><td class="num" style="direction:ltr;text-align:right">6,210 / 840 <span class="est">≈</span></td><td class="num">5.8s</td><td class="num" style="font-weight:700">~3 קר׳</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
         <tr class="click" onclick="openCall()"><td class="num">07.09 13:58:02</td><td><span class="pill f3">תמלול</span></td><td>workflow</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">DEAD…-002</td><td>Soniox</td><td>stt-async-preview</td><td class="num">22:40 דק׳</td><td class="num">96s</td><td class="num" style="font-weight:700">$0.420</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
         <tr class="click" onclick="openCall()"><td class="num">07.09 13:41:19</td><td><span class="pill f4">הקלטת וואטסאפ</span></td><td>inbound</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">DEAD…-002</td><td>Soniox</td><td>stt-async-preview</td><td class="num">3:05 דק׳</td><td class="num">18s</td><td class="num" style="font-weight:700">$0.058</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
         <tr class="click" onclick="openCall()"><td class="num">07.09 12:15:37</td><td><span class="pill f5">סימולטור</span></td><td>y.mizrahi@…</td><td class="num">—</td><td>OpenAI</td><td>gpt-4o</td><td class="num" style="direction:ltr;text-align:right">1,320 / 260 <span class="exact">✓</span></td><td class="num">2.1s</td><td class="num" style="font-weight:700">$0.006</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
         <tr class="click" onclick="openCall()"><td class="num">07.09 11:02:50</td><td><span class="pill f1">ניתוח אירוע</span></td><td>d.levi@…</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">NEGB…-001</td><td>InvokeLLM</td><td>claude-sonnet-5</td><td class="num" style="direction:ltr;text-align:right">~18,200 / — <span class="est">≈</span></td><td class="num">31.5s</td><td class="num">—</td><td><span class="pill p-fb">נפילה → gpt-4o</span></td><td class="mag">🔍</td></tr>
         <tr class="click" onclick="openCall()"><td class="num">07.09 10:44:12</td><td><span class="pill f6">תרגום</span></td><td>scheduled</td><td class="num">—</td><td>OpenAI</td><td>gpt-4o-mini</td><td class="num" style="direction:ltr;text-align:right">2,140 / 610 <span class="exact">✓</span></td><td class="num">1.4s</td><td class="num" style="font-weight:700">$0.001</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
-        <tr class="click" onclick="openCall()"><td class="num">07.09 09:12:55</td><td><span class="pill f7">קליטת מלאי</span></td><td>a.biton@…</td><td class="num">—</td><td>ExtractFile</td><td>base44</td><td class="num" style="direction:ltr;text-align:right">— <span class="est">≈</span></td><td class="num">11.2s</td><td class="num" style="font-weight:700">~$0.050</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
-        <tr class="click" onclick="openCall()"><td class="num">07.09 08:30:01</td><td><span class="pill f2">סיכום תשאול</span></td><td>workflow</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">DEAD…-002</td><td>InvokeLLM</td><td>gpt_5_mini</td><td class="num" style="direction:ltr;text-align:right">4,890 / 720 <span class="est">≈</span></td><td class="num">6.3s</td><td class="num" style="font-weight:700">~$0.009</td><td><span class="pill p-err">שגיאה · timeout</span></td><td class="mag">🔍</td></tr>
+        <tr class="click" onclick="openCall()"><td class="num">07.09 09:12:55</td><td><span class="pill f7">קליטת מלאי</span></td><td>a.biton@…</td><td class="num">—</td><td>ExtractFile</td><td>base44</td><td class="num" style="direction:ltr;text-align:right">— <span class="est">≈</span></td><td class="num">11.2s</td><td class="num" style="font-weight:700">~1 קר׳</td><td><span class="pill p-ok">הצלחה</span></td><td class="mag">🔍</td></tr>
+        <tr class="click" onclick="openCall()"><td class="num">07.09 08:30:01</td><td><span class="pill f2">סיכום תשאול</span></td><td>workflow</td><td style="direction:ltr;text-align:right;font-family:var(--mono);font-size:11px">DEAD…-002</td><td>InvokeLLM</td><td>gpt_5_mini</td><td class="num" style="direction:ltr;text-align:right">4,890 / 720 <span class="est">≈</span></td><td class="num">6.3s</td><td class="num" style="font-weight:700">~3 קר׳</td><td><span class="pill p-err">שגיאה · timeout</span></td><td class="mag">🔍</td></tr>
       </table></div>
       <div class="pager" style="padding:12px 16px">
         <span>1,847 קריאות · עמוד 1 מתוך 185</span>
@@ -443,10 +443,11 @@
           <tr><th>מודל</th><th>קלט $ / 1M</th><th>פלט $ / 1M</th><th>סוג</th></tr>
           <tr><td>gpt-4o</td><td><input class="pin" value="2.50"></td><td><input class="pin" value="10.00"></td><td>טוקנים</td></tr>
           <tr><td>gpt-4o-mini</td><td><input class="pin" value="0.15"></td><td><input class="pin" value="0.60"></td><td>טוקנים</td></tr>
-          <tr><td>gpt_5_mini <span class="pill f3">credits</span></td><td><input class="pin" value="0.25"></td><td><input class="pin" value="2.00"></td><td>מוערך</td></tr>
+          <tr><td>gpt_5_mini <span class="pill f3">credits</span></td><td colspan="2"><input class="pin" value="3" style="width:110px"> קרדיטים / קריאה</td><td>קרדיטים</td></tr>
+          <tr><td>InvokeLLM · GPT-class <span class="pill f3">credits</span></td><td colspan="2"><input class="pin" value="15" style="width:110px"> קרדיטים / קריאה</td><td>קרדיטים</td></tr>
           <tr><td>whisper-1</td><td colspan="2"><input class="pin" value="0.006" style="width:110px"> $ / דקה</td><td>אודיו</td></tr>
           <tr><td>stt-async-preview</td><td colspan="2"><input class="pin" value="6.20" style="width:110px"> $ / שעה</td><td>אודיו</td></tr>
-          <tr><td>gpt_5_5 <span class="pill f3">agent</span></td><td colspan="2"><input class="pin" value="0.007" style="width:110px"> $ / הודעה</td><td>מוערך</td></tr>
+          <tr><td>gpt_5_5 <span class="pill f3">agent</span></td><td colspan="2"><input class="pin" value="3" style="width:110px"> קרדיטים / הודעה</td><td>קרדיטים</td></tr>
         </table></div>
         <div class="foot-note">שער המרה: <input class="pin" value="3.72" style="width:64px"> ₪/$ · מודל לא מוכר ביומן ⇒ עלות null + דגל, לעולם לא מספר מומצא.</div>
       </div>
@@ -515,11 +516,13 @@
         <div class="mcard">
           <h4>חישוב עלות</h4>
           <table class="cost">
+            <tr class="tot"><td>חיוב בפועל · קרדיטי אינטגרציה Base44</td><td>~15 קר׳</td></tr>
+            <tr><td style="padding-top:10px;color:var(--mut)">שווי שוק משוער (לו נקרא ישירות):</td><td></td></tr>
             <tr><td>קלט · 21,480 טוקנים × $2.50 / 1M</td><td>$0.0537</td></tr>
             <tr><td>פלט · 1,920 טוקנים × $10.00 / 1M</td><td>$0.0192</td></tr>
-            <tr class="tot"><td>סה״כ</td><td>$0.0729</td></tr>
+            <tr><td>סה״כ שווי $</td><td>$0.0729</td></tr>
           </table>
-          <div class="foot-note">מקור טוקנים: <b style="color:var(--good)">✓ usage מדויק מה־API</b> · תמחור: llm_pricing_json (ערכי הדגמה) · ≈ ₪0.27</div>
+          <div class="foot-note">קרדיטים: credit_costs_json (GPT-class ≈ 15/קריאה) · טוקנים: <b style="color:var(--good)">✓ usage מדויק</b> · תמחור $: llm_pricing_json (ערכי הדגמה)</div>
         </div>
       </div>
 
