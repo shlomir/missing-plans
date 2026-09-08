@@ -134,7 +134,7 @@
       <div style="margin-top:14px">
         <div class="srcrow"><span>OpenAI API</span><b>$14.31</b></div>
         <div class="srcrow"><span>Soniox STT</span><b>$19.20</b></div>
-        <div class="srcrow"><span>Base44 credits</span><b>~$8.35</b></div>
+        <div class="srcrow"><span>Base44 · קרדיטי אינטגרציה</span><b>8,320/50k</b></div>
         <div class="srcrow"><span>PDF Monkey · מכסת דוחות</span><b>118/300</b></div>
         <div class="srcrow"><span>מנויים קבועים</span><b>₪668</b></div>
       </div>
@@ -233,6 +233,47 @@
         <text x="349" y="99" fill="#8ba3c7" font-size="10.5">ר. חדד · $6.20</text>
       </svg>
       <div class="sub">העלות לא נקבעת לפי אורך האירוע אלא לפי <b style="color:#5fc3ff">נפח התשאולים והניתוחים</b> — אירוע של 4 ימים עקף אירוע של 12. חריג ענברי = מעל $2.5/יום.</div>
+    </div>
+  </div>
+
+  <!-- row 3.5: Base44 credits -->
+  <div class="grid g3s">
+    <div class="cell" style="border-color:rgba(255,125,125,.4)">
+      <div class="lab" style="color:#ff9d9d">מיכל דלק · קרדיטי Base44 <span class="info">Elite · חידוש 04.10 10:16 UTC</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#b9cbe6;margin-bottom:5px"><span>Integration credits</span><b style="font-family:var(--mono);color:#fff;direction:ltr">8,320 / 50,000</b></div>
+      <div style="height:14px;border-radius:7px;background:#14203a;direction:ltr;overflow:hidden;position:relative">
+        <div style="height:100%;width:16.6%;background:linear-gradient(90deg,var(--blue-d),var(--blue));float:right"></div>
+        <div style="position:absolute;top:0;bottom:0;right:88%;width:2px;background:var(--red)"></div>
+      </div>
+      <div class="sub" style="margin-top:4px">קצב: <b style="color:#fff">1,890~ ליום</b> (מחזור בן 4 ימים) → <b style="color:var(--red)">צפי אפס: 30.09 — 4 ימים לפני החידוש</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#b9cbe6;margin:14px 0 5px"><span>Message credits <span style="color:var(--dim)">(בנייה)</span></span><b style="font-family:var(--mono);color:#fff;direction:ltr">145 / 1,200</b></div>
+      <div style="height:14px;border-radius:7px;background:#14203a;direction:ltr;overflow:hidden">
+        <div style="height:100%;width:12.1%;background:linear-gradient(90deg,#1a7a5c,var(--aqua));float:right"></div>
+      </div>
+      <div class="sub" style="margin-top:4px">~29/יום · צפי לחידוש: ~900 — בטוח</div>
+      <div class="sub" style="margin-top:10px;color:#ffb3b3">⚠ אין חיוב חריגה — ב־0 קרדיטים <b>הקריאות פשוט נכשלות</b>: ניתוח, מיילים וסוכן יושבתו באמצע אירוע. התראה ב־85% או כשצפי האפס מקדים את החידוש.</div>
+    </div>
+    <div class="cell">
+      <div class="lab">מה שורף קרדיטי אינטגרציה <span class="info">לפי תיעוד Base44 · משוער</span></div>
+      <div class="fam"><span>InvokeLLM · automatic</span><b>~1 / קריאה</b></div>
+      <div class="fam"><span>InvokeLLM · Gemini Flash</span><b>~5 / קריאה</b></div>
+      <div class="fam"><span>InvokeLLM · GPT-5.4</span><b style="color:var(--amber)">~15 / קריאה</b></div>
+      <div class="fam"><span>סוכן בקאופיס (gpt_5_5)</span><b style="color:var(--amber)">~3–30 / הודעה</b></div>
+      <div class="fam"><span>SendEmail</span><b>1–2 / מייל</b></div>
+      <div class="fam"><span>OCR · UploadFile · תמונה</span><b>~1</b></div>
+      <div class="fam"><span>ריצת Workflow (יש 7)</span><b>~1 / ריצה</b></div>
+      <div class="sub" style="margin-top:8px">קריאות במפתחות שלנו (OpenAI, Soniox, PDF Monkey) <b style="color:var(--aqua)">לא צורכות קרדיטים</b>. קרון התרגומים שורף קרדיט בכל ריצה — גם כשאין עבודה.</div>
+    </div>
+    <div class="cell">
+      <div class="lab">איך עוקבים · אין API למונים</div>
+      <div class="fam"><span>1 · מדידה עצמית ביומן</span><b style="color:var(--aqua)">אוטומטי</b></div>
+      <div class="sub" style="margin-top:-2px">כל שורת LLMCallLog מקבלת <span style="font-family:var(--mono);font-size:11px">credits_estimate</span> לפי טבלת credit_costs_json (מודל × פעולה).</div>
+      <div class="fam" style="margin-top:8px"><span>2 · צילום מונים ידני</span><b>שבועי</b></div>
+      <div class="sub" style="margin-top:-2px">כפתור ״עדכן מונים״: מזינים את שני המספרים ממסך ה־Workspace → נשמר כ־CreditSnapshot עם חותמת זמן.</div>
+      <div class="fam" style="margin-top:8px"><span>3 · כיול (Reconciliation)</span><b style="color:var(--aqua)">Δ 4.2%</b></div>
+      <div class="sub" style="margin-top:-2px">הפרש המונה האמיתי בין צילומים ÷ סכום ההערכות שלנו = מקדם כיול. סטייה מעל 15% ⇒ דגל שטבלת העלויות התיישנה.</div>
+      <div class="fam" style="margin-top:8px"><span>4 · תחזית ריקון מול חידוש</span><b style="color:var(--red)">30.09</b></div>
+      <div class="sub" style="margin-top:-2px">קצב יומי × ימים לחידוש. אם צפי האפס מקדים את החידוש — התראת וואטסאפ למנהלים + המלצת שדרוג/רכישה.</div>
     </div>
   </div>
 
